@@ -17,3 +17,5 @@
 - Файл [run_shadow](run_shadow.py) и [run_optimize](run_optimize.py)
   - Выводится ответ на задачу №64
 - Обновлены [тесты](tests)
+- Добавлен файл .gitignore
+- 
