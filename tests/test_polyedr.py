@@ -40,10 +40,11 @@ class TestPolyedr(unittest.TestCase):
 
     def test_solve_task64(self):
         task64_file_content = """1.0   0.0   0.0   0.0
-2   0   1
-0.0   0.0   1.0
+3   0   1
+0.0   0.0   2.0
 0.0   0.0   0.0
-2   1   2
+0.0   1.0   0.0
+3   1   2   3
 """
         task64_file_path = 'data/task64.geom'
         with patch('shadow.polyedr.open'.format(__name__),
