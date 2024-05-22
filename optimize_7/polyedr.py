@@ -1,4 +1,4 @@
-from math import pi, sqrt, floor, ceil, acos, radians
+from math import pi, sqrt, floor, ceil, acos, radians, sin
 from time import time
 from random import randrange
 from functools import reduce
@@ -288,7 +288,7 @@ class Polyedr:
                 if edge.center().is_inside_circle(2) and \
                         (angle <= radians(10) or angle >= radians(170)):
 
-                    total_length += edge.__len__()
+                    total_length += edge.__len__() * sin(angle)
                     # Выделение "исключительного" ребра (для наглядности)
                     for s in edge.gaps:
                         tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),
