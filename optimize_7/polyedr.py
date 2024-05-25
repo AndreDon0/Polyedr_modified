@@ -163,6 +163,8 @@ class Polyedr:
 
     # Параметры конструктора: файл, задающий полиэдр
     def __init__(self, file):
+        # Истинные списки вершин, рёбер и граней полиэдра
+        self.vertexes0, self.edges0, self.facets0 = [], [], []
 
         # списки вершин, рёбер и граней полиэдра
         self.vertexes, self.edges, self.facets = [], [], []
@@ -183,6 +185,7 @@ class Polyedr:
                 elif i < nv + 2:
                     # задание всех вершин полиэдра
                     x, y, z = (float(x) for x in line.split())
+                    self.vertexes0.append(R3(x, y, z))
                     self.vertexes.append(R3(x, y, z).rz(
                         alpha).ry(beta).rz(gamma) * c)
                 else:
@@ -191,15 +194,26 @@ class Polyedr:
                     # количество вершин очередной грани
                     size = int(buf.pop(0))
                     # массив вершин этой грани
+                    vertexes0 = list(self.vertexes0[int(n) - 1] for n in buf)
                     vertexes = list(self.vertexes[int(n) - 1] for n in buf)
                     # задание рёбер грани
                     for n in range(size):
+                        self.edges0.append(Edge(vertexes0[n - 1],
+                                                vertexes0[n]))
                         self.edges.append(Edge(vertexes[n - 1], vertexes[n]))
+
                     # задание самой грани
+                    self.facets0.append(Facet(vertexes0))
                     self.facets.append(Facet(vertexes))
 
     # Удаление дубликатов рёбер
     def edges_uniq(self):
+        edges0 = {}
+        for e in self.edges0:
+            if (e.beg, e.fin) not in edges0 and (e.fin, e.beg) not in edges0:
+                edges0[(e.beg, e.fin)] = e
+        self.edges0 = list(edges0.values())
+
         edges = {}
         for e in self.edges:
             if (e.beg, e.fin) not in edges and (e.fin, e.beg) not in edges:
@@ -278,17 +292,17 @@ class Polyedr:
 
         # Решить задачу №64
     def solve_task64(self, tk):
-        total_length = 0
-        for edge in self.edges:
+        total_length = 0.0
+        for edge0, edge in zip(self.edges0, self.edges):
             # Проверка полной видимости ребра
             if len(edge.gaps) == 1 and edge.gaps[0].beg == Edge.SBEG and \
                     edge.gaps[0].fin == Edge.SFIN:
                 # Проверка дополнительных условий
-                angle = edge.angle_with_vector(self.V)
-                if edge.center().is_inside_circle(2) and \
+                angle = edge0.angle_with_vector(self.V)
+                if edge0.center().is_inside_circle(2) and \
                         (angle <= radians(10) or angle >= radians(170)):
 
-                    total_length += edge.__len__() * sin(angle)
+                    total_length += edge0.__len__()
                     # Выделение "исключительного" ребра (для наглядности)
                     for s in edge.gaps:
                         tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),

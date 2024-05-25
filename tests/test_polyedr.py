@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, mock_open
 from common.tk_drawer import TkDrawer
-from shadow.polyedr import Polyedr
+from optimize_7.polyedr import Polyedr
 
 
 class TestPolyedr(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestPolyedr(unittest.TestCase):
 4	1    4    8    5"""
 
         fake_file_path = 'data/holey_box.geom'
-        with patch('shadow.polyedr.open'.format(__name__),
+        with patch('optimize_7.polyedr.open'.format(__name__),
                    new=mock_open(read_data=fake_file_content)) as _file:
             self.polyedr = Polyedr(fake_file_path)
             _file.assert_called_once_with(fake_file_path)
@@ -39,17 +39,6 @@ class TestPolyedr(unittest.TestCase):
         self.assertEqual(len(self.polyedr.edges), 16)
 
     def test_solve_task64(self):
-        task64_file_content = """1.0   0.0   0.0   0.0
-3   0   1
-0.0   0.0   2.0
-0.0   0.0   0.0
-0.0   1.0   0.0
-3   1   2   3
-"""
-        task64_file_path = 'data/task64.geom'
-        with patch('shadow.polyedr.open'.format(__name__),
-                   new=mock_open(read_data=task64_file_content)) as _file:
-            tk = TkDrawer()
-            polyedr64 = Polyedr(task64_file_path)
-            answer = polyedr64.solve_task64(tk)
-            self.assertAlmostEqual(answer, 2)
+        tk = TkDrawer()
+        answer = self.polyedr.solve_task64(tk)
+        self.assertAlmostEqual(answer, 8)

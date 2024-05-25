@@ -13,10 +13,15 @@ try:
         start_time = time()
         poly = Polyedr(f"data/{name}.geom")
         poly.draw(tk)
-        delta_time = time() - start_time
-        print(f"Изображение полиэдра '{name}' заняло {delta_time} сек.")
+        start_solve64_time = time()
+        print(f"Изображение полиэдра '{name}' заняло {start_solve64_time - \
+                                                      start_time} сек.")
+        print("Расчет длинны для задания №64 ---------> ", end="", flush=True)
         answer = poly.solve_task64(tk)
-        print(f"Ответ на задачу №64: {answer}")
+        tk.root.update()
+        print("%6.2f сек.\n   Ответ на задачу №64: %s"
+              % (time() - start_solve64_time, answer))
+
         input("Hit 'Return' to continue -> ")
 except (EOFError, KeyboardInterrupt):
     print("\nStop")
