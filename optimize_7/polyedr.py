@@ -290,7 +290,7 @@ class Polyedr:
             t1, t2 = t2, t1
         return range(floor(t1 / self.step), ceil(t2 / self.step) + 1)
 
-        # Решить задачу №64
+    # Решить задачу №64
     def solve_task64(self, tk):
         total_length = 0.0
         for edge0, edge in zip(self.edges0, self.edges):

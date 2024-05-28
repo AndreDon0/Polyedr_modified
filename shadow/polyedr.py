@@ -196,21 +196,21 @@ class Polyedr:
                 tk.draw_line(e.r3(s.beg), e.r3(s.fin))
 
     # Решить задачу №64
-    def solve_task64(self, tk):
+    def solve_task64(self):
         total_length = 0.0
         for edge0, edge in zip(self.edges0, self.edges):
             # Проверка полной видимости ребра
+            angle = edge0.angle_with_vector(self.V)
             if len(edge.gaps) == 1 and edge.gaps[0].beg == Edge.SBEG and \
-                    edge.gaps[0].fin == Edge.SFIN:
-                # Проверка дополнительных условий
-                angle = edge0.angle_with_vector(self.V)
-                if edge0.center().is_inside_circle(2) and \
-                        (angle <= radians(10) or angle >= radians(170)):
-
-                    total_length += edge0.__len__()
-                    # Выделение "исключительного" ребра (для наглядности)
-                    for s in edge.gaps:
-                        tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),
-                                     color="red")
+                    edge.gaps[0].fin == Edge.SFIN and \
+                    edge0.center().is_inside_circle(2) and \
+                    (angle <= radians(10) or angle >= radians(170)):
+                total_length += edge0.__len__()
+                """
+                # Выделение "исключительного" ребра (для наглядности)
+                for s in edge.gaps:
+                    tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),
+                                    color="red")
+                """
 
         return total_length
