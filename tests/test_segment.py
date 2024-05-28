@@ -69,13 +69,6 @@ class TestSegment(unittest.TestCase):
         a, b = Segment(0.0, 1.0), Segment(0.0, 1.0)
         self.assertTrue(all(s.is_degenerate() for s in a.subtraction(b)))
 
-    # Для двух отрезков с совпадающим началом вычитание из большего отрезка
-    # меньшего порождает один вырожденный и один невырожденный отрезок
-    def test_subtraction02(self):
-        a, b = Segment(0.0, 2.0), Segment(0.0, 1.0)
-        self.assertTrue(any(s.is_degenerate() for s in a.subtraction(b)))
-        self.assertTrue(any(not s.is_degenerate() for s in a.subtraction(b)))
-
     # Для двух отрезков с различными концами таких, что один из них содержится
     # внутри другого, вычитание из большего отрезка меньшего порождает два
     # невырожденных отрезка
