@@ -14,7 +14,7 @@ try:
         poly = Polyedr(f"data/{name}.geom")
         poly.draw(tk)
         start_solve64_time = time()
-        print(f"Изображение полиэдра '{name}' заняло {start_solve64_time - \
+        print(f"Изображение полиэдра '{name}' заняло {start_solve64_time -
                                                       start_time} сек.")
         print("Расчет длинны для задания №64 ---------> ", end="", flush=True)
         answer = poly.solve_task64(tk)
