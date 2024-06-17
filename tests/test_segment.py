@@ -2,7 +2,7 @@ import unittest
 
 from functools import reduce
 from operator import add
-from shadow.polyedr import Segment
+from optimize_7.polyedr import Segment
 from tests.matchers import SegmentApproxMatcher
 
 

@@ -8,6 +8,7 @@ from common.r3 import R3
 
 class Segment:
     """ Одномерный отрезок """
+
     # Параметры конструктора: начало и конец отрезка (числа)
 
     def __init__(self, beg, fin):
@@ -107,6 +108,11 @@ class Edge:
                                                * vector.length())
         return acos(cos_angle)
 
+    # Проверка полной видимости ребра (для задания №64)
+    def is_visibility(self):
+        return len(self.gaps) == 1 and self.gaps[0].beg == Edge.SBEG and \
+            self.gaps[0].fin == Edge.SFIN
+
 
 class Facet:
     """ Грань полиэдра """
@@ -138,7 +144,7 @@ class Facet:
         self._center = sum(self.vertexes, R3(0.0, 0.0, 0.0)
                            ) * (1.0 / len(self.vertexes))
         n = (
-            self.vertexes[1] - self.vertexes[0]).cross(
+                self.vertexes[1] - self.vertexes[0]).cross(
             self.vertexes[2] - self.vertexes[0])
         self._h_normal = n * (-1.0) if n.dot(Polyedr.V) < 0.0 else n
         self._v_normals = [self._vert(x) for x in range(len(self.vertexes))]
@@ -152,8 +158,8 @@ class Facet:
     # Вспомогательный метод
     def _vert(self, k):
         n = (self.vertexes[k] - self.vertexes[k - 1]).cross(Polyedr.V)
-        return n * \
-            (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) < 0.0 else n
+        return n * (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) \
+            < 0.0 else n
 
 
 class Polyedr:
@@ -176,9 +182,10 @@ class Polyedr:
                     # обрабатываем первую строку; buf - вспомогательный массив
                     buf = line.split()
                     # коэффициент гомотетии
-                    c = float(buf.pop(0))
+                    self.c = float(buf.pop(0))
                     # углы Эйлера, определяющие вращение
-                    alpha, beta, gamma = (float(x) * pi / 180.0 for x in buf)
+                    self.alpha, self.beta, self.gamma = \
+                        (float(x) * pi / 180.0 for x in buf)
                 elif i == 1:
                     # во второй строке число вершин, граней и рёбер полиэдра
                     nv, nf, ne = (int(x) for x in line.split())
@@ -187,7 +194,7 @@ class Polyedr:
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes0.append(R3(x, y, z))
                     self.vertexes.append(R3(x, y, z).rz(
-                        alpha).ry(beta).rz(gamma) * c)
+                        self.alpha).ry(self.beta).rz(self.gamma) * self.c)
                 else:
                     # вспомогательный массив
                     buf = line.split()
@@ -224,20 +231,20 @@ class Polyedr:
     def optimize(self):
         stage_time = time()
         result = "   Удаление дубликатов рёбер\n" + \
-            "     Рёбер до    : %6d\n" % len(self.edges)
+                 "     Рёбер до    : %6d\n" % len(self.edges)
         self.edges_uniq()
         result += "     Рёбер после : %6d\n" % len(self.edges) + \
-            "     Время       : %6.2f сек.\n" % (time() - stage_time)
+                  "     Время       : %6.2f сек.\n" % (time() - stage_time)
         stage_time = time()
         for f in self.facets:
             f.precompile()
         result += "   Предкомпиляция граней\n" + \
-            "     Время       : %6.2f сек.\n" % (time() - stage_time)
+                  "     Время       : %6.2f сек.\n" % (time() - stage_time)
         stage_time = time()
         self.facets_nests()
         result += "   Гнездование граней\n" + \
-            "     Размер гнёзд: %6.2f\n" % self.step + \
-            "     Время       : %6.2f сек." % (time() - stage_time)
+                  "     Размер гнёзд: %6.2f\n" % self.step + \
+                  "     Время       : %6.2f сек." % (time() - stage_time)
         return result
 
     # «Умное» нахождение «просветов» на ребре
@@ -273,7 +280,8 @@ class Polyedr:
         self.nests = {}
         # Вычисление оптимального размера гнёзд сетки
         edges = [self.edges[randrange(len(self.edges))] for i in range(COUNT)]
-        self.step = sum((sqrt((e.fin.x - e.beg.x)**2 + (e.fin.y - e.beg.y)**2)
+        self.step = sum((sqrt((e.fin.x - e.beg.x) ** 2 +
+                              (e.fin.y - e.beg.y) ** 2)
                          for e in edges)) / (2 * COUNT)
         for f in self.facets:
             for i in self.to_range(f.xmin, f.xmax):
@@ -291,19 +299,20 @@ class Polyedr:
         return range(floor(t1 / self.step), ceil(t2 / self.step) + 1)
 
     # Решить задачу №64
-    def solve_task64(self, tk):
+    def solve_task64(self, tk=None):
         total_length = 0.0
-        for edge0, edge in zip(self.edges0, self.edges):
-            # Проверка полной видимости ребра
-            if len(edge.gaps) == 1 and edge.gaps[0].beg == Edge.SBEG and \
-                    edge.gaps[0].fin == Edge.SFIN:
-                # Проверка дополнительных условий
-                angle = edge0.angle_with_vector(self.V)
-                if edge0.center().is_inside_circle(2) and \
-                        (angle <= radians(10) or angle >= radians(170)):
+        # Нахождение вертикали при данных углах эйлера
+        vert = self.V.rz(self.alpha).ry(self.beta).rz(self.gamma)
 
-                    total_length += edge0.__len__()
-                    # Выделение "исключительного" ребра (для наглядности)
+        for edge0, edge in zip(self.edges0, self.edges):
+            # Проверка полной видимости ребра и нужного угла с вертикалью
+            angle = edge0.angle_with_vector(vert)
+            if edge.is_visibility() and edge0.center().is_inside_circle(2) and\
+                    (angle <= radians(10) or angle >= radians(170)):
+                total_length += edge0.__len__()
+
+                # Выделение "исключительного" ребра (для наглядности)
+                if tk is not None:
                     for s in edge.gaps:
                         tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),
                                      color="red")

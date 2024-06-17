@@ -4,4 +4,4 @@
 __pycache__/
 
 .coverage
-
+gui.ui

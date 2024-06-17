@@ -43,12 +43,12 @@ class TestPolyedr(unittest.TestCase):
 
     def test_solve_task64_1(self):
         answer = self.polyedr.solve_task64()
-        self.assertAlmostEqual(answer, 8)
+        self.assertAlmostEqual(answer, 0.0)
 
     def test_solve_task64_2(self):
         p = Polyedr("data/king.geom")
         answer = p.solve_task64()
-        self.assertAlmostEqual(answer, 1.3680962732692867)
+        self.assertAlmostEqual(answer, 11.56827278283067)
 
 
 """
