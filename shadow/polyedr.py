@@ -100,6 +100,11 @@ class Edge:
                                                * vector.length())
         return acos(cos_angle)
 
+    # Проверка полной видимости ребра (для задания №64)
+    def is_visibility(self):
+        return len(self.gaps) == 1 and self.gaps[0].beg == Edge.SBEG and \
+            self.gaps[0].fin == Edge.SFIN
+
 
 class Facet:
     """ Грань полиэдра """
@@ -157,9 +162,10 @@ class Polyedr:
                     # обрабатываем первую строку; buf - вспомогательный массив
                     buf = line.split()
                     # коэффициент гомотетии
-                    c = float(buf.pop(0))
+                    self.c = float(buf.pop(0))
                     # углы Эйлера, определяющие вращение
-                    alpha, beta, gamma = (float(x) * pi / 180.0 for x in buf)
+                    self.alpha, self.beta, self.gamma = \
+                        (float(x) * pi / 180.0 for x in buf)
                 elif i == 1:
                     # во второй строке число вершин, граней и рёбер полиэдра
                     nv, nf, ne = (int(x) for x in line.split())
@@ -168,7 +174,7 @@ class Polyedr:
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes0.append(R3(x, y, z))
                     self.vertexes.append(R3(x, y, z).rz(
-                        alpha).ry(beta).rz(gamma) * c)
+                        self.alpha).ry(self.beta).rz(self.gamma) * self.c)
                 else:
                     # вспомогательный массив
                     buf = line.split()
@@ -198,19 +204,14 @@ class Polyedr:
     # Решить задачу №64
     def solve_task64(self):
         total_length = 0.0
+        # Нахождение вертикали при данных углах эйлера
+        vert = self.V.rz(self.alpha).ry(self.beta).rz(self.gamma)
+
         for edge0, edge in zip(self.edges0, self.edges):
-            # Проверка полной видимости ребра
-            angle = edge0.angle_with_vector(self.V)
-            if len(edge.gaps) == 1 and edge.gaps[0].beg == Edge.SBEG and \
-                    edge.gaps[0].fin == Edge.SFIN and \
-                    edge0.center().is_inside_circle(2) and \
+            # Проверка полной видимости ребра и нужного угла с вертикалью
+            angle = edge0.angle_with_vector(vert)
+            if edge.is_visibility() and edge0.center().is_inside_circle(2) and\
                     (angle <= radians(10) or angle >= radians(170)):
                 total_length += edge0.__len__()
-                """
-                # Выделение "исключительного" ребра (для наглядности)
-                for s in edge.gaps:
-                    tk.draw_line(p=edge.r3(s.beg), q=edge.r3(s.fin),
-                                    color="red")
-                """
 
         return total_length

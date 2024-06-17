@@ -24,6 +24,9 @@ class R3:
     def __truediv__(self, k):
         return self * (1 / k)
 
+    def __repr__(self):
+        return f"R3: {self.x}, {self.y}, {self.z}"
+
     # Поворот вокруг оси Oz
     def rz(self, fi):
         return R3(
