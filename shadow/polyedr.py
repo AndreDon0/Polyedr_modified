@@ -93,12 +93,12 @@ class Edge:
         return center
 
     # Угол между ребром и вектором (для задания №64)
-    def angle_with_vector(self, vector):
+    def angle_with_vector(self, vector, abc: bool = False):
         s = self.gaps[0]
         edge_vector = self.r3(s.fin) - self.r3(s.beg)
         cos_angle = edge_vector.dot(vector) / (edge_vector.length()
                                                * vector.length())
-        return acos(cos_angle)
+        return acos(abs(cos_angle) if abc else cos_angle)
 
     # Проверка полной видимости ребра (для задания №64)
     def is_visibility(self):
@@ -209,9 +209,9 @@ class Polyedr:
 
         for edge0, edge in zip(self.edges0, self.edges):
             # Проверка полной видимости ребра и нужного угла с вертикалью
-            angle = edge0.angle_with_vector(vert)
+            angle = edge0.angle_with_vector(vert, abc=True)
             if edge.is_visibility() and edge0.center().is_inside_circle(2) and\
-                    (angle <= radians(10) or angle >= radians(170)):
+                    angle <= radians(10):
                 total_length += edge0.__len__()
 
         return total_length
