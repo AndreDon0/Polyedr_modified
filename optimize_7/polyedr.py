@@ -307,7 +307,7 @@ class Polyedr:
         for edge0, edge in zip(self.edges0, self.edges):
             # Проверка полной видимости ребра и нужного угла с вертикалью
             angle = edge0.angle_with_vector(vert, abc=True)
-            if edge.is_visibility() and edge0.center().is_inside_circle(2) and \
+            if edge.is_visibility() and edge0.center().is_inside_circle(2) and\
                     angle <= radians(10):
                 total_length += edge0.__len__()
 
